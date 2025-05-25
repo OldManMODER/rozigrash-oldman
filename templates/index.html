@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Розіграш від OldMan</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+    h1 { text-align: center; }
+    #participants { margin-top: 20px; background: white; padding: 10px; border-radius: 8px; }
+    button { margin-top: 10px; padding: 10px; font-size: 16px; }
+    #winner { margin-top: 20px; font-weight: bold; font-size: 20px; color: green; }
+  </style>
+</head>
+<body>
+  <h1>Розіграш від OldMan</h1>
+
+  <label for="keyword">Кодове слово:</label>
+  <input type="text" id="keyword" placeholder="наприклад: !участь">
+  <button onclick="announceKeyword()">Оголосити кодове слово</button>
+
+  <button onclick="pickWinner()">Оголосити переможця</button>
+
+  <div id="winner"></div>
+
+  <script>
+    function announceKeyword() {
+      const keyword = document.getElementById("keyword").value;
+      fetch("/set_keyword", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword })
+      }).then(() => {
+        fetch("/announce_keyword", { method: "POST" });
+      });
+    }
+
+    function pickWinner() {
+      fetch("/pick_winner", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.winner) {
+            document.getElementById("winner").textContent = "Переможець: " + data.winner;
+          } else {
+            document.getElementById("winner").textContent = "Немає учасників.";
+          }
+        });
+    }
+  </script>
+</body>
+</html>
